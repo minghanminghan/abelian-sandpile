@@ -8,8 +8,7 @@ def toString(arr:list[int]) -> str:
     for row in range(length):
         for col in range(length):
             out += f'[{arr[row*length+col]}] '
-        if row < length-1:
-            out += '\n'
+        out += '\n'
     return out
 
 #get value
@@ -55,19 +54,22 @@ def enq(arr:list[int], element:int) -> list[int]: #maybe return nothing
 def deq(arr:list[int]) -> int:
     return arr.pop()
 def showq(arr:list[int]) -> str:
-    out = '['
+    if len(arr) == 0:
+        return ''
+    out = 'q:['
     for i in range(len(arr)):
         out += f'{arr[i]}'
         if i != len(arr)-1:
             out += f', '
-    out += ']'
+    out += ']\n'
     return out
 
 def recursiveCollapse(arr:list[int], q:list[int], limit:int, iter:int) -> list[int]: #big collapse function
     if len(q) == 0: #exit condition
         return arr
     index = deq(q)
-    print(f'iter: {iter}')
+    print(f'iteration #{iter}')
+    print(showq(q))
     print(toString(arr)) #display
     #collapse function
     cardinalIndex = getValidCardinal(arr, index)
@@ -78,8 +80,7 @@ def recursiveCollapse(arr:list[int], q:list[int], limit:int, iter:int) -> list[i
             if arr[i] >= limit:
                 if i not in q:
                     enq(q, i)
-    print(f'q:{showq(q)}\n')
-    time.sleep(1.5)#wait time
+    time.sleep(0.5)#wait time
     return recursiveCollapse(arr, q, limit, iter+1) #recursive call
 
 #define a check stabilization function, searches through the array for any int > limit, if so adds it to q and calls recCollapse
@@ -92,53 +93,24 @@ def checkStable(arr:list[int], q:list[int], limit:int) -> list[int]:
             break
     return stable
 
-#creating array of random numbers
-#arr1 = [None] * 16
-arr1 = [4] * 9
-q = []
-limit = 4
-#for i in range(len(arr1)):
-#    arr1[i] = random.randint(0, 8)
+def main():
+    #getting vars
+    length = int(input('array sidelength >'))
+    limit = int(input('sandpile limit >'))
 
-#testing block:
-iter = 0
-while not checkStable(arr1, q, limit):
-    arr1 = recursiveCollapse(arr1, q, limit, iter)
+    #creating vars
+    pile = [None]* (length**2)
+    q = []
+    for i in range(len(pile)):
+        pile[i] = random.randint(0, int(limit*1.5))
+    iter = 0
 
-print('stable output')
-print(toString(arr1))
+    #running collapse function
+    while not checkStable(pile, q, limit):
+        pile = recursiveCollapse(pile, q, limit, iter)
 
-'''
-#testing block
-arr1 = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-length = len(arr1)
-print(toString(arr1))
-print('getting right')
-for i in range(length):
-    print(getRight(arr1, i))
-print('\ngetting left')
-for i in range(length):
-    print(getLeft(arr1, i))
-print('\ngetting up')
-for i in range(length):
-    print(getUp(arr1, i))
-print('\ngetting down')
-for i in range(length):
-    print(getDown(arr1, i))
+    #final output
+    print('stable output')
+    print(toString(pile))
 
-#testing block
-startIndex = random.randint(0, len(arr1))
-q = []
-enq(q, startIndex)
-print(showq(q))
-print(deq(q))
-print(showq(q))
-
-#testing block
-print(toString(arr1))
-print(f'starting index: {startIndex}')
-print(f'left of start: {getLeft(arr1, startIndex)}')
-print(f'right of start: {getRight(arr1, startIndex)}')
-print(f'up of start: {getUp(arr1, startIndex)}')
-print(f'down of start: {getDown(arr1, startIndex)}')
-'''
+main()
